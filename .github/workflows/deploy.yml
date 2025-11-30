@@ -9,31 +9,37 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Decode SSH Key
+      - name: Decode EC2 SSH Key
         run: |
-          echo "$EC2_KEY_BASE64" | base64 -d > ec2.pem
-          chmod 600 ec2.pem
+          echo "$EC2_KEY_BASE64" | base64 -d > zomato.pem
+          chmod 600 zomato.pem
 
-      - name: Deploy to EC2
+      - name: Upload files to EC2
         run: |
-          ssh -o StrictHostKeyChecking=no -i ec2.pem ubuntu@ec2-3-25-153-152.ap-southeast-2.compute.amazonaws.com << 'EOF'
+          rsync -avz -e "ssh -o StrictHostKeyChecking=no -i zomato.pem" ./ ubuntu@ec2-3-25-153-152.ap-southeast-2.compute.amazonaws.com:/home/ubuntu/app/
+
+      - name: Deploy on EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no -i zomato.pem ubuntu@ec2-3-25-153-152.ap-southeast-2.compute.amazonaws.com << 'EOF'
             cd ~/app
 
-            # Pull latest code
-            git pull origin main || true
-
-            # Install requirements
+            # Activate environment
             source myenv/bin/activate
+
+            # Install dependencies
             pip install -r requirements.txt --quiet
 
-            # Kill previous Streamlit
+            # Kill old Streamlit process
             pkill -f streamlit || true
 
-            # Restart Streamlit
-            nohup streamlit run app.py --server.port 8501 --server.address 0.0.0.0 > streamlit.log 2>&1 &
+            # Restart Streamlit in background
+            nohup streamlit run app.py \
+              --server.port 8501 \
+              --server.address 0.0.0.0 \
+              > streamlit.log 2>&1 &
           EOF
         env:
           EC2_KEY_BASE64: ${{ secrets.EC2_KEY_BASE64 }}
