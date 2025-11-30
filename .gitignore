@@ -1,0 +1,50 @@
+# ==============================
+# ENVIRONMENTS
+# ==============================
+myenv/
+venv/
+env/
+.venv/
+.env
+*.env
+
+# ==============================
+# PYTHON CACHE / COMPILED FILES
+# ==============================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+
+# ==============================
+# BUILD / PACKAGE FILES
+# ==============================
+dist/
+build/
+*.egg-info/
+
+# ==============================
+# DATA FILES (OPTIONAL)
+# ==============================
+*.csv
+*.xlsx
+*.parquet
+*.h5
+*.db
+
+# ==============================
+# JUPYTER NOTEBOOK CHECKPOINTS
+# ==============================
+.ipynb_checkpoints/
+
+# ==============================
+# STREAMLIT / LOGS
+# ==============================
+.streamlit/secrets.toml
+logs/
+*.log
+
+# ==============================
+# MODEL FILES (OPTIONAL)
+# ==============================
